@@ -38,7 +38,7 @@ export default function Navbar(/* { session : { session : Session | null }} */) 
               <span className="text-gray-700">Hi, {session.user?.name}</span>
               <button
                 onClick={() => signOut()}
-                className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
+                className="flex items-center justify-center ring-1 ring-black text-white bg-black hover:bg-white hover:text-black px-3 py-1 shadow-md rounded"
               >
                 Sign Out
               </button>
