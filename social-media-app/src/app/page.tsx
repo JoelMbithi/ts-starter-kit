@@ -1,5 +1,6 @@
 
 import { getPost } from "@/actions/post.actions";
+import { getDbUserId } from "@/actions/user.action";
 import CreatePost from "@/components/MainContainer/CreatePost";
 import { ModeToggle } from "@/components/ModeToggle";
 import PostCard from "@/components/Post/PostCard";
@@ -12,6 +13,7 @@ import Image from "next/image";
 export default async function Home() {
   const user = await currentUser()
   const posts = await getPost()
+  const dbUserId = await getDbUserId()
 
   return (
    <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
@@ -20,7 +22,7 @@ export default async function Home() {
 
         <div className="space-y-6">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post}/>
+            <PostCard key={post.id} post={post} dbUserId={dbUserId}/>
           ))}
         </div>
        </div>

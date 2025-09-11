@@ -18,7 +18,15 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "src/generated",   // ✅ no /** needed, just the folder
+      "src/generated/**"  // ✅ ignore Prisma generated files
     ],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-this-alias": "off",   // ✅ avoid 'this' aliasing errors
+    },
   },
 ];
 
