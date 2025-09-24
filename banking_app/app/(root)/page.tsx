@@ -1,6 +1,7 @@
 import React from 'react'
 import HeaderBox from '../../components/HeaderBox'
 import TotalBalanceBox from '@/components/TotalBalanceBox'
+import RightSidebar from '@/components/Sidebar/RightSidebar'
 
 const Home = () => {
   const loggedIn = { firstName: 'Joe'}
@@ -21,7 +22,9 @@ const Home = () => {
    totalCurrentBalance={1248.57}
     />
       </header>
+
      </div>
+     <RightSidebar user={loggedIn} />
     </div>
   )
 }
