@@ -8,14 +8,14 @@ declare type SearchParamProps = {
 // ========================================
 
 declare type SignUpParams = {
-  firstName: string;
-  lastName: string;
-  address1: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  dateOfBirth: string;
-  ssn: string;
+  firstName?: string;
+  lastName?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  code?: string;
+  date?: string;
+  gender?: string;
   email: string;
   password: string;
 };
@@ -137,7 +137,7 @@ declare type NewDwollaCustomerParams = {
 };
 
 declare interface CreditCardProps {
-  account: Account;
+  accounts: Account;
   userName: string;
   showBalance?: boolean;
 }
@@ -326,3 +326,15 @@ declare interface getBankProps {
 declare interface getBankByAccountIdProps {
   accountId: string;
 }
+
+
+// types/auth.ts
+export type SignUpParams = {
+  email: string;
+  password: string;
+};
+
+export type SignInParams = {
+  email: string;
+  password: string;
+};
