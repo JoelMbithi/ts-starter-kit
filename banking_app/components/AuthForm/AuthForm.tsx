@@ -22,7 +22,7 @@ import {
 
 import { signIn, signUp } from "@/lib/actions/user.actions"
 
-//  Schemas
+//  Schema
 const signInSchema = z.object({
   email: z.string().email({ message: "Enter a valid email" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
