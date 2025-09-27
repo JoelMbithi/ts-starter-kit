@@ -1,3 +1,4 @@
+import { HeaderBoxProps } from '@/types'
 import React from 'react'
 
 const page = ({type="title", title,subtext,user}: HeaderBoxProps) => {

@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import BankCard from '../Bank/BankCard'
+import { RightSidebarProps } from '@/types'
 
 const RightSidebar = ({user,transactions,banks}: RightSidebarProps) => {
   return (
@@ -9,13 +10,13 @@ const RightSidebar = ({user,transactions,banks}: RightSidebarProps) => {
       <section className='flex flex-col pb-8'>
         <div className='h-[120px] w-full bg-blue-600 bg-cover bg-no-repeat relative'>
           <div className='absolute top-20 left-6 flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 border-4 border-white shadow-xl'>
-            <span className='text-5xl font-bold text-blue-500'>{user.firstName[0]}</span>
+            <span className='text-5xl font-bold text-blue-500'>{user?.firstName?.[0] || "G"}</span>
           </div>
           <div className='flex flex-col pt-50 pl-6'>
             <h1 className='text-24 font-semibold text-gray-900'>
-              {user.firstName} {user.lastName}
+              {user?.firstName || "Guest"} {user?.lastName || ""}
             </h1>
-            <p className='text-sm text-gray-500'>{user.email}</p>
+            <p className='text-sm text-gray-500'>{user?.email}</p>
           </div>
         </div>
       </section>
@@ -35,7 +36,7 @@ const RightSidebar = ({user,transactions,banks}: RightSidebarProps) => {
               <BankCard
                 key={banks[0].$id}
                 accounts={banks[0]}
-                userName={`${user.firstName} ${user.lastName}`}
+                userName={`${user?.firstName} ${user?.lastName}`}
                 showBalance={false}
                 
               />
@@ -45,7 +46,7 @@ const RightSidebar = ({user,transactions,banks}: RightSidebarProps) => {
                 <BankCard
                 key={banks[1].$id}
                 accounts={banks[1]}
-                userName={`${user.firstName} ${user.lastName}`}
+                  userName={`${user?.firstName} ${user?.lastName}`}
                 showBalance={false}
                 
               /> 

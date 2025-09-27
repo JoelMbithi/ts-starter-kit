@@ -1,10 +1,10 @@
 
 import AuthForm from '@/components/AuthForm/AuthForm'
-import { getLoggedInUser } from '@/lib/actions/user.actions'
+
 import React from 'react'
 
 const SignIn = async () => {
-  const loggedUser = await getLoggedInUser()
+ 
  
 
   

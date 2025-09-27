@@ -1,0 +1,86 @@
+// prisma/schema.prisma - Replace the content with this:
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  metadata  Json?    // optional, store extra info
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  accounts Account[]
+  banks    Bank[]
+
+  @@map("users")
+}
+
+model Account {
+  id               String   @id @default(cuid())
+  availableBalance Float    @default(0)
+  currentBalance   Float    @default(0)
+  officialName     String
+  mask             String
+  institutionId    String
+  name             String
+  type             String
+  subtype          String
+  appwriteItemId   String?
+  sharableId       String?
+  createdAt        DateTime @default(now())
+
+  // Relations
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  name            String
+  paymentChannel  String
+  amount          Float
+  pending         Boolean  @default(false)
+  category        String
+  date            DateTime
+  image           String?
+  channel         String?
+  senderBankId    String?
+  receiverBankId  String?
+  createdAt       DateTime @default(now())
+
+  // Relations
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model Bank {
+  id                  String   @id @default(cuid())
+  accountId           String
+  bankId              String
+  accessToken         String
+  fundingSourceUrl    String?
+  sharableId          String?
+  createdAt           DateTime @default(now())
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("banks")
+}

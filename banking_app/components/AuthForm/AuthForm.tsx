@@ -19,8 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-
-import { signIn, signUp } from "@/lib/actions/user.actions"
+import { signIn, signUp } from "@/lib/actions/auth.actions"
 
 //  Schema
 const signInSchema = z.object({
@@ -29,13 +28,13 @@ const signInSchema = z.object({
 })
 
 const signUpSchema = signInSchema.extend({
-  FirstName: z.string().min(3, { message: "First name must be at least 3 characters" }),
-  LastName: z.string().min(3, { message: "Last name must be at least 3 characters" }),
-  Address: z.string().min(3, { message: "Address must be at least 3 characters" }),
-  City: z.string().min(3, { message: "City must be at least 3 characters" }),
-  Gender: z.string().min(3, { message: "Gender is required" }),
-  Code: z.string().min(3, { message: "Postal code must be at least 3 characters" }),
-  Date: z.string().min(3, { message: "Date of Birth is required" }),
+  firstName: z.string().min(3, { message: "First name must be at least 3 characters" }),
+  lastName: z.string().min(3, { message: "Last name must be at least 3 characters" }),
+  address: z.string().min(3, { message: "Address must be at least 3 characters" }),
+  city: z.string().min(3, { message: "City must be at least 3 characters" }),
+  gender: z.string().min(3, { message: "Gender is required" }),
+  code: z.string().min(3, { message: "Postal code must be at least 3 characters" }),
+  date: z.string().min(3, { message: "Date of Birth is required" }),
 })
 
 type AuthFormProps = {
@@ -51,32 +50,57 @@ export default function AuthForm({ type }: AuthFormProps) {
     defaultValues: {
       email: "",
       password: "",
-      FirstName: "",
-      LastName: "",
-      Address: "",
-      City: "",
-      Gender: "",
-      Code: "",
-      Date: "",
+      firstName: "",
+      lastName: "",
+      address: "",
+      city: "",
+      gender: "",
+      code: "",
+      date: "",
     },
   })
 
-  const onSubmit = async (values: any) => {
-    setLoading(true)
-    try {
-      if (type === "sign-in") {
-        const user = await signIn({ email: values.email, password: values.password })
-        if (user) router.push("/")
-      } else {
-        const newUser = await signUp(values)
-        if (newUser) router.push("/sign-in")
+ const onSubmit = async (values: any) => {
+  setLoading(true);
+  try {
+    if (type === "sign-in") {
+      const { user, token } = await signIn({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (token && user) {
+        localStorage.setItem("authToken", token);          // Save JWT
+        localStorage.setItem("authUser", JSON.stringify(user)); // Save user info
+        console.log("User signed in:", user); 
+        router.push("/"); // redirect to home
       }
-    } catch (err) {
-      console.error("Auth error:", err)
-    } finally {
-      setLoading(false)
+    } else {
+      const { user, token } = await signUp({
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        address: values.address,
+        city: values.city,
+        gender: values.gender,
+        code: values.code,
+        date: values.date,
+      });
+
+      if (token && user) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("authUser", JSON.stringify(user));
+        router.push("/");
+      }
     }
+  } catch (err) {
+    console.error("Auth error:", err);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   return (
     <section className="flex min-h-screen w-full max-w-[520px] flex-col justify-center gap-6 px-6 py-10">
@@ -105,7 +129,7 @@ export default function AuthForm({ type }: AuthFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="FirstName"
+                  name="firstName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
@@ -116,7 +140,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="LastName"
+                  name="lastName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
@@ -130,7 +154,7 @@ export default function AuthForm({ type }: AuthFormProps) {
               {/* City */}
               <FormField
                 control={form.control}
-                name="City"
+                name="city"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>City</FormLabel>
@@ -144,7 +168,7 @@ export default function AuthForm({ type }: AuthFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="Address"
+                  name="address"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Address</FormLabel>
@@ -155,7 +179,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="Code"
+                  name="code"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Postal Code</FormLabel>
@@ -170,7 +194,7 @@ export default function AuthForm({ type }: AuthFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="Gender"
+                  name="gender"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Gender</FormLabel>
@@ -181,7 +205,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="Date"
+                  name="date"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Date of Birth</FormLabel>
@@ -243,6 +267,7 @@ export default function AuthForm({ type }: AuthFormProps) {
           {type === "sign-in" ? "Sign Up" : "Login"}
         </Link>
       </footer>
+      
     </section>
   )
 }
