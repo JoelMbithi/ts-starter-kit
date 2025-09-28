@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { SignUpParams, SignInParams } from "@/types";
 import { prisma } from "@/lib/prisma";
+import { CountryCode, Products } from "plaid";
+import type { User } from "@/types";
+import { plaidClient } from "../plaid";
+import { parseStringify } from "../utils";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -61,3 +65,22 @@ export const getLoggedInUser = async (token?: string) => {
 };
 
 
+export const createLinkToken = async (user: User) => {
+  try {
+    const tokenParams = {
+      user: {
+        client_user_id: user.$id
+      },
+      client_name: user.name,
+      products:['auth'] as Products[],
+      language: 'en',
+      country_codes: ['US'] as CountryCode[],
+    }
+
+    const  response = await plaidClient.linkTokenCreate(tokenParams)
+
+    return parseStringify({ linkToken: response.data.link_token})
+  } catch (error) {
+    console.error("createLinkToken error:", error);
+  }
+}

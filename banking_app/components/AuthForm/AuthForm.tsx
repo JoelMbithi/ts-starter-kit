@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-
+import PlaidLink from "../plaid/PlaidLink"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -44,6 +44,7 @@ type AuthFormProps = {
 export default function AuthForm({ type }: AuthFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<any>(null)   // <-- add this
 
   const form = useForm<z.infer<typeof signUpSchema | typeof signInSchema>>({
     resolver: zodResolver(type === "sign-in" ? signInSchema : signUpSchema),
@@ -60,46 +61,34 @@ export default function AuthForm({ type }: AuthFormProps) {
     },
   })
 
- const onSubmit = async (values: any) => {
-  setLoading(true);
-  try {
-    if (type === "sign-in") {
-      const { user, token } = await signIn({
-        email: values.email,
-        password: values.password,
-      });
+  const onSubmit = async (values: any) => {
+    setLoading(true);
+    try {
+      if (type === "sign-in") {
+        const { user, token } = await signIn(values);
 
-      if (token && user) {
-        localStorage.setItem("authToken", token);          // Save JWT
-        localStorage.setItem("authUser", JSON.stringify(user)); // Save user info
-        console.log("User signed in:", user); 
-        router.push("/"); // redirect to home
-      }
-    } else {
-      const { user, token } = await signUp({
-        email: values.email,
-        password: values.password,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        address: values.address,
-        city: values.city,
-        gender: values.gender,
-        code: values.code,
-        date: values.date,
-      });
+        if (token && user) {
+          localStorage.setItem("authToken", token);
+          localStorage.setItem("authUser", JSON.stringify(user));
+          setUser(user);                   // <-- save user in state
+          router.push("/");
+        }
+      } else {
+        const { user, token } = await signUp(values);
 
-      if (token && user) {
-        localStorage.setItem("authToken", token);
-        localStorage.setItem("authUser", JSON.stringify(user));
-        router.push("/");
+        if (token && user) {
+          localStorage.setItem("authToken", token);
+          localStorage.setItem("authUser", JSON.stringify(user));
+          setUser(user);                   // <-- save user in state
+          router.push("/");
+        }
       }
+    } catch (err) {
+      console.error("Auth error:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Auth error:", err);
-  } finally {
-    setLoading(false);
   }
-};
 
 
   return (
@@ -120,7 +109,13 @@ export default function AuthForm({ type }: AuthFormProps) {
         </div>
       </header>
 
-      {/* Form */}
+     {/*  {user ? ( */}
+        <div className="flex flex-col gap-4">
+          <PlaidLink user={user} variant="primary"/>
+        </div>
+   {/*    ): ( */}
+        <>
+           {/* Form */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
           {type === "sign-up" && (
@@ -253,7 +248,10 @@ export default function AuthForm({ type }: AuthFormProps) {
             ) : type === "sign-in" ? "Sign In" : "Sign Up"}
           </Button>
         </form>
-      </Form>
+      </Form></>
+     {/*  )}
+ */}
+   
 
       {/* Footer */}
       <footer className="flex justify-center gap-1 text-sm">

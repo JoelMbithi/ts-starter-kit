@@ -14,7 +14,7 @@ export default function RootLayout({
       <div>
         <Image src="/icons/auth-image.svg" alt="auth-image" width={580} height={520}/>
       </div>
-      GFBRT
+ 
      
     </div>
    </main>
