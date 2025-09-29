@@ -37,7 +37,7 @@ model Account {
   type             String
   subtype          String
   appwriteItemId   String?
-  sharableId       String?
+ shareableId      String?
   createdAt        DateTime @default(now())
 
   // Relations
@@ -59,6 +59,7 @@ model Transaction {
   image           String?
   channel         String?
   senderBankId    String?
+   shareableId          String?
   receiverBankId  String?
   createdAt       DateTime @default(now())
 
@@ -75,7 +76,7 @@ model Bank {
   bankId              String
   accessToken         String
   fundingSourceUrl    String?
-  sharableId          String?
+  shareableId          String?
   createdAt           DateTime @default(now())
 
   // Relations

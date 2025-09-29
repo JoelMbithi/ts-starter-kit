@@ -32,9 +32,11 @@ const signUpSchema = signInSchema.extend({
   lastName: z.string().min(3, { message: "Last name must be at least 3 characters" }),
   address: z.string().min(3, { message: "Address must be at least 3 characters" }),
   city: z.string().min(3, { message: "City must be at least 3 characters" }),
-  gender: z.string().min(3, { message: "Gender is required" }),
+  state: z.string().min(2, { message: "State is required (2-letter code)" }),
   code: z.string().min(3, { message: "Postal code must be at least 3 characters" }),
   date: z.string().min(3, { message: "Date of Birth is required" }),
+  ssn: z.string().min(4, { message: "SSN (last 4 digits) is required" }),
+  gender: z.string().min(3, { message: "Gender is required" }),
 })
 
 type AuthFormProps = {
@@ -44,7 +46,7 @@ type AuthFormProps = {
 export default function AuthForm({ type }: AuthFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState<any>(null)   // <-- add this
+  const [user, setUser] = useState<any>(null)
 
   const form = useForm<z.infer<typeof signUpSchema | typeof signInSchema>>({
     resolver: zodResolver(type === "sign-in" ? signInSchema : signUpSchema),
@@ -55,40 +57,94 @@ export default function AuthForm({ type }: AuthFormProps) {
       lastName: "",
       address: "",
       city: "",
-      gender: "",
+      state: "",
       code: "",
       date: "",
+      ssn: "",
+      gender: "",
     },
   })
 
-  const onSubmit = async (values: any) => {
-    setLoading(true);
-    try {
-      if (type === "sign-in") {
-        const { user, token } = await signIn(values);
+ const onSubmit = async (values: any) => {
+  setLoading(true);
+  try {
+    if (type === "sign-in") {
+      const { user, token } = await signIn(values);
 
-        if (token && user) {
-          localStorage.setItem("authToken", token);
-          localStorage.setItem("authUser", JSON.stringify(user));
-          setUser(user);                   // <-- save user in state
-          router.push("/");
-        }
-      } else {
-        const { user, token } = await signUp(values);
-
-        if (token && user) {
-          localStorage.setItem("authToken", token);
-          localStorage.setItem("authUser", JSON.stringify(user));
-          setUser(user);                   // <-- save user in state
-          router.push("/");
+      if (token && user) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("authUser", JSON.stringify(user));
+        setUser(user);
+        router.push("/");
+      }
+    } else {
+      // --- normalize/format fields required by Dwolla/backend ---
+      // 1) Format DOB to YYYY-MM-DD
+      let formattedDob = "";
+      if (values.date) {
+        const d = new Date(values.date);
+        if (!isNaN(d.getTime())) {
+          formattedDob = d.toISOString().split("T")[0]; // "YYYY-MM-DD"
         }
       }
-    } catch (err) {
-      console.error("Auth error:", err);
-    } finally {
-      setLoading(false);
+
+      // 2) Ensure state is uppercase 2-letter (best effort)
+      const state = (values.state || "").toString().trim().toUpperCase().slice(0, 2);
+
+      // 3) SSN: keep last 4 digits only (Dwolla sandbox expects last 4)
+      const ssnRaw = (values.ssn || "").toString().replace(/\D/g, "");
+      const ssn = ssnRaw.length >= 4 ? ssnRaw.slice(-4) : ssnRaw;
+
+      // 4) Postal code normalization (pad/trim to 5 digits if you want)
+      const postal = (values.code || "").toString().trim();
+
+      // Build payload matching SignUpParams expected by your server
+      const payload = {
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        address1: values.address,      // map form `address` -> address1
+        city: values.city,
+        state,                         // 2-letter
+        postalCode: postal,
+        dateOfBirth: formattedDob,     // YYYY-MM-DD
+        ssn,                           // last 4 digits
+      };
+
+      // Optional: quick client-side validations
+      if (!payload.dateOfBirth) {
+        throw new Error("Please provide a valid date of birth.");
+      }
+      if (!state || state.length !== 2) {
+        // Prefer to show friendly UI, but we throw here so server sees nothing invalid
+        throw new Error("Please provide a valid 2-letter US state code (e.g. CA).");
+      }
+      if (!payload.postalCode) {
+        throw new Error("Please provide a postal code.");
+      }
+      if (!payload.ssn || payload.ssn.length !== 4) {
+        throw new Error("Please provide the last 4 digits of your SSN (sandbox only).");
+      }
+
+      // Call your server action with normalized payload
+      const { user: createdUser, token } = await signUp(payload);
+
+      if (token && createdUser) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("authUser", JSON.stringify(createdUser));
+        setUser(createdUser);
+        router.push("/");
+      }
     }
+  } catch (err) {
+    console.error("Auth error:", err);
+    // optionally show a toast or set form error
+  } finally {
+    setLoading(false);
   }
+};
+
 
 
   return (
@@ -109,149 +165,183 @@ export default function AuthForm({ type }: AuthFormProps) {
         </div>
       </header>
 
-     {/*  {user ? ( */}
+      {user ? (
         <div className="flex flex-col gap-4">
           <PlaidLink user={user} variant="primary"/>
         </div>
-   {/*    ): ( */}
+      ): (
         <>
-           {/* Form */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          {type === "sign-up" && (
-            <>
-              {/* First & Last Name */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl><Input placeholder="Enter first name" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl><Input placeholder="Enter last name" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+          {/* Form */}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+              {type === "sign-up" && (
+                <>
+                  {/* First & Last Name */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="firstName" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl><Input placeholder="Enter first name" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="lastName" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl><Input placeholder="Enter last name" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}/>
+                  </div>
 
-              {/* City */}
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>City</FormLabel>
-                    <FormControl><Input placeholder="Enter city" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Address & Postal Code */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
+                  {/* Address, City, State & Postal Code */}
+                  <FormField control={form.control} name="address" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Address</FormLabel>
                       <FormControl><Input placeholder="Enter address" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Postal Code</FormLabel>
-                      <FormControl><Input placeholder="12345" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                  )}/>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField control={form.control} name="city" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <FormControl><Input placeholder="Enter city" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}/>
+                   <FormField control={form.control} name="state" render={({ field }) => (
+  <FormItem>
+    <FormLabel>State</FormLabel>
+    <FormControl>
+      <select
+        {...field}
+        className="w-full border rounded-md p-2"
+        required
+      >
+        <option value="">Select State</option>
+        <option value="AL">AL</option>
+        <option value="AK">AK</option>
+        <option value="AZ">AZ</option>
+        <option value="AR">AR</option>
+        <option value="CA">CA</option>
+        <option value="CO">CO</option>
+        <option value="CT">CT</option>
+        <option value="DE">DE</option>
+        <option value="FL">FL</option>
+        <option value="GA">GA</option>
+        <option value="HI">HI</option>
+        <option value="ID">ID</option>
+        <option value="IL">IL</option>
+        <option value="IN">IN</option>
+        <option value="IA">IA</option>
+        <option value="KS">KS</option>
+        <option value="KY">KY</option>
+        <option value="LA">LA</option>
+        <option value="ME">ME</option>
+        <option value="MD">MD</option>
+        <option value="MA">MA</option>
+        <option value="MI">MI</option>
+        <option value="MN">MN</option>
+        <option value="MS">MS</option>
+        <option value="MO">MO</option>
+        <option value="MT">MT</option>
+        <option value="NE">NE</option>
+        <option value="NV">NV</option>
+        <option value="NH">NH</option>
+        <option value="NJ">NJ</option>
+        <option value="NM">NM</option>
+        <option value="NY">NY</option>
+        <option value="NC">NC</option>
+        <option value="ND">ND</option>
+        <option value="OH">OH</option>
+        <option value="OK">OK</option>
+        <option value="OR">OR</option>
+        <option value="PA">PA</option>
+        <option value="RI">RI</option>
+        <option value="SC">SC</option>
+        <option value="SD">SD</option>
+        <option value="TN">TN</option>
+        <option value="TX">TX</option>
+        <option value="UT">UT</option>
+        <option value="VT">VT</option>
+        <option value="VA">VA</option>
+        <option value="WA">WA</option>
+        <option value="WV">WV</option>
+        <option value="WI">WI</option>
+        <option value="WY">WY</option>
+      </select>
+    </FormControl>
+    <FormMessage />
+  </FormItem>
+)}/>
 
-              {/* Gender & DOB */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Gender</FormLabel>
-                      <FormControl><Input placeholder="Enter gender" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
-                      <FormControl><Input type="date" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </>
-          )}
+                    <FormField control={form.control} name="code" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Postal Code</FormLabel>
+                        <FormControl><Input placeholder="12345" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}/>
+                  </div>
 
-          {/* Email */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl><Input type="email" placeholder="Enter your email" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  {/* Gender, DOB & SSN */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField control={form.control} name="gender" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender</FormLabel>
+                        <FormControl><Input placeholder="Enter gender" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="date" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date of Birth</FormLabel>
+                        <FormControl><Input type="date" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="ssn" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SSN (Last 4 digits)</FormLabel>
+                        <FormControl><Input placeholder="1234" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}/>
+                  </div>
+                </>
+              )}
 
-          {/* Password */}
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl><Input type="password" placeholder="Enter password" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {/* Email */}
+              <FormField control={form.control} name="email" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl><Input type="email" placeholder="Enter your email" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}/>
 
-          {/* Submit button */}
-          <Button type="submit" className="bg-blue-500 w-full text-white hover:bg-blue-400" disabled={loading}>
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 size={18} className="animate-spin" /> Please wait...
-              </span>
-            ) : type === "sign-in" ? "Sign In" : "Sign Up"}
-          </Button>
-        </form>
-      </Form></>
-     {/*  )}
- */}
-   
+              {/* Password */}
+              <FormField control={form.control} name="password" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl><Input type="password" placeholder="Enter password" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}/>
+
+              {/* Submit button */}
+              <Button type="submit" className="bg-blue-500 w-full text-white hover:bg-blue-400" disabled={loading}>
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 size={18} className="animate-spin" /> Please wait...
+                  </span>
+                ) : type === "sign-in" ? "Sign In" : "Sign Up"}
+              </Button>
+            </form>
+          </Form>
+        </>
+      )}
 
       {/* Footer */}
       <footer className="flex justify-center gap-1 text-sm">
@@ -265,7 +355,6 @@ export default function AuthForm({ type }: AuthFormProps) {
           {type === "sign-in" ? "Sign Up" : "Login"}
         </Link>
       </footer>
-      
     </section>
   )
 }
