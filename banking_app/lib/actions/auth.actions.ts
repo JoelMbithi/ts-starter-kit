@@ -259,24 +259,27 @@ export const createBankAccount = async ({
 }
 
 export const createLinkToken = async (user: User) => {
+  if (!user || !user.id) throw new Error("Valid user with id is required");
+
+  const tokenParams = {
+    user: {
+      client_user_id: String(user.id), // must be string
+    },
+    client_name: `${user.firstName} ${user.lastName}`, // combine names
+    products: ["auth"] as Products[],
+    country_codes: ["US"] as CountryCode[],
+    language: "en",
+  }
+
   try {
-    const tokenParams = {
-      user: {
-        client_user_id: user.$id
-      },
-      client_name: user.name,
-      products:['auth'] as Products[],
-      language: 'en',
-      country_codes: ['US'] as CountryCode[],
-    }
-
-    const  response = await plaidClient.linkTokenCreate(tokenParams)
-
-    return parseStringify({ linkToken: response.data.link_token})
-  } catch (error) {
-    console.error("createLinkToken error:", error);
+    const response = await plaidClient.linkTokenCreate(tokenParams)
+    return parseStringify({ linkToken: response.data.link_token })
+  } catch (err: any) {
+    console.error("createLinkToken error:", err.response?.data || err.message)
+    throw new Error("Failed to create Plaid link token")
   }
 }
+
 
 
 export const exchangePublicToken = async ({
@@ -313,7 +316,7 @@ export const exchangePublicToken = async ({
        })
 
        await createBankAccount({
-        userId: user.$id,
+        userId: user.id,
         bankId: itemId,
         accountId:accountData.account_id,
         accessToken,

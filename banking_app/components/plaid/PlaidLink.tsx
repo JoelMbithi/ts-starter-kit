@@ -1,59 +1,55 @@
+"use client"
+
 import { PlaidLinkProps } from '@/types'
-import { PlaidLinkOnSuccess, usePlaidLink } from 'react-plaid-link';
-import { PlaidLinkOptions } from 'react-plaid-link'
+import { PlaidLinkOnSuccess, usePlaidLink, PlaidLinkOptions } from 'react-plaid-link'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
-
 import { useRouter } from 'next/navigation'
-import { createLinkToken } from '@/lib/actions/auth.actions';
+import { createLinkToken } from '@/lib/actions/auth.actions'
 
-const plaidlink = ({user, variant}: PlaidLinkProps) => {
-  const [token, setToke] = useState('')
+const PlaidLinkComponent = ({ user, variant = 'primary' }: PlaidLinkProps) => {
+  const [token, setToken] = useState<string>('')
   const router = useRouter()
 
   useEffect(() => {
+    if (!user) return
     const createToken = async () => {
-      const data = await createLinkToken(user)  
-      setToke(data.linkToken)
+      const data = await createLinkToken(user)
+      setToken(data.linkToken)
     }
-  },[user])
+    createToken()
+  }, [user])
 
-  const onSuccess = useCallback<PlaidLinkOnSuccess>(async (public_token: String ) => {
-
-   /*  await exchangePublicToken({
-      publicToken: public_token,
-      user,
-    }) */
-   router.push('/')
-  },[user])
+  const onSuccess = useCallback<PlaidLinkOnSuccess>(async (public_token: string) => {
+    // TODO: exchange public token with backend
+    console.log('Plaid connected for user', user, 'with token:', public_token)
+    router.push('/')
+  }, [user, router])
 
   const config: PlaidLinkOptions = {
     token,
-    onSuccess
+    onSuccess,
   }
 
   const { open, ready } = usePlaidLink(config)
 
   return (
     <>
-      {variant === 'primary'  ? (
-        <Button className='w-full bg-blue-500 text-white hover:bg-blue-600'
-        onClick={() => open()}
-        disabled={!ready}
+      {variant === 'primary' ? (
+        <Button
+          className="w-full bg-blue-500 text-white hover:bg-blue-600"
+          onClick={() => open()}
+          disabled={!ready || !token}
         >
-          Connect bank 
-        </Button>
-      ) : variant=== 'ghost' ? (
-        <Button >
-          Connect your bank account
-        </Button>
-      ): (
-        <Button>
           Connect Bank
         </Button>
+      ) : variant === 'ghost' ? (
+        <Button>Connect your bank account</Button>
+      ) : (
+        <Button>Connect Bank</Button>
       )}
     </>
   )
 }
 
-export default plaidlink
+export default PlaidLinkComponent

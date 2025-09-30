@@ -26,7 +26,7 @@ declare type LoginUser = {
 };
 
 declare type User = {
-  $id: string;
+  id: string;
   email: string;
   userId: string;
   dwollaCustomerUrl: string;
@@ -65,7 +65,7 @@ declare type Account = {
 
 declare type Transaction = {
   id: string;
-  $id: string;
+  id: string;
   name: string;
   paymentChannel: string;
   type: string;
@@ -83,7 +83,7 @@ declare type Transaction = {
 };
 
 declare type Bank = {
-  $id: string;
+  id: string;
   accountId: string;
   bankId: string;
   accessToken: string;
@@ -177,6 +177,8 @@ declare interface PlaidLinkProps {
   user: User;
   variant?: "primary" | "ghost";
   dwollaCustomerId?: string;
+   onSuccess?: () => void   
+  disabled?: boolean    
 }
 
 // declare type User = sdk.Models.Document & {

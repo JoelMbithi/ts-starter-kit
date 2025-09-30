@@ -40,7 +40,7 @@ const Home = () => {
   transactions={[]}
   banks={[
     {
-      $id: "1",
+      id: "1",
       accountId: "1",
       bankId: "1",
       accessToken: "",
@@ -59,7 +59,7 @@ const Home = () => {
       appwriteItemId: "1",
     },
     {
-      $id: "2",
+      id: "2",
       accountId: "2",
       bankId: "2",
       accessToken: "",
