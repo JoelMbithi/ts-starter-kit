@@ -21,6 +21,7 @@ export enum FormFieldType {
    SELECT = "select",
    SKELETON= "skeleton",
    PASSWORD="password"
+   
 }
  
 const formSchema = z.object({

@@ -28,10 +28,11 @@ interface CustomFormProps {
     placeholder?:string,
     iconSrc?: string
     iconAlt?: string
+    renderSkeleton?: (field: any) => React.ReactNode;
 }
 
 const RenderField = ({props,field}: { field: any, props:CustomFormProps}) => {
-  const {control, formField,name,label,placeholder,iconSrc,iconAlt} = props
+  const {control, formField,name,label,placeholder,iconSrc,iconAlt, renderSkeleton} = props
    switch (formField) {
     case FormFieldType.INPUT:
       return(
@@ -81,8 +82,35 @@ const RenderField = ({props,field}: { field: any, props:CustomFormProps}) => {
          </FormControl>
         </div>
       )
+      case FormFieldType.DATE_PICKER:
+      return(
+        <div className='flex rounded-md ring-1 ring-gray-700 bg-black'>
+          {iconSrc && (
+            <Image
+              src={iconSrc}
+              width={24}
+              height={24}
+              alt={iconAlt || 'icon'}
+              className='ml-2'
+            />
+          )}
+          <FormControl>
+           <Input
+           type='date'
+              placeholder={placeholder}
+              {...field}
+            className="bg-black placeholder:text-dark-600 border-0 border-dark-500 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+
+
+           />
+         </FormControl>
+        </div>
+      )
+      case FormFieldType.SKELETON:
+      return renderSkeleton ? renderSkeleton (field) : null
+
       case FormFieldType.PHONE_INPUT:
-        return(
+        return (
          <div className="flex rounded-md ring-1 ring-gray-700 bg-black">
   <FormControl>
     <PhoneInput
@@ -92,7 +120,7 @@ const RenderField = ({props,field}: { field: any, props:CustomFormProps}) => {
       withCountryCallingCode
       value={field.value as E164Number | undefined}
       onChange={field.onChange}
-      className="w-full p-2"
+      className="p-1 "
     />
   </FormControl>
 </div>
