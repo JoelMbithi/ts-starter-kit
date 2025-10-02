@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { signIn, signUp } from "@/lib/actions/auth.actions"
+import FlutterwaveLink from "@/lib/flutterPlay/FlutterwaveLink"
 
 // Schema
 const signInSchema = z.object({
@@ -142,6 +143,7 @@ export default function AuthForm({ type }: AuthFormProps) {
 
       {user ? (
           <div className="flex flex-col gap-4">
+         {/*     <FlutterwaveLink user={user} variant="primary" /> */}
     <PlaidLink
       user={user}
       variant="primary"

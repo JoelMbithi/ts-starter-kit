@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"  // or sqlite/mysql if you prefer
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String?
+  phone     String
+  password  String
+  createdAt DateTime  @default(now())
+  patients  Patient[] // one user can have many patients
+}
+
+model Patient {
+  id                        Int      @id @default(autoincrement())
+  email                     String   @unique
+  name                      String?
+  phone                     String
+  privacyConcent            Boolean
+  gender                    String?
+  birthDate                 String
+  address                   String
+  occupation                String
+  emergencyContactName      String
+  emergencyContactNumber    String
+  insuranceProvider         String
+  insurancePolicyNumber     String
+  allergies                 String
+  currentMedication         String
+  familyMedicalHistory      String
+  pastmedicalHistory        String
+  identificationType        String
+  identificationNumber      Int
+  identificationId          Int
+  identificationDocumentUrl String
+  primaryPhysicion          String
+  createdAt                 DateTime @default(now())
+
+  // relation to User
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1A1D21;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* Dark background for dropdown */
+.PhoneInputCountrySelect {
+  background-color: #1f2937; /* Tailwind dark-800 */
+  color: #f9fafb;
+  border: none !important;
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+}
+
+/* Style options in the dropdown */
+.PhoneInputCountrySelect option {
+  background-color: #111827;
+  color: #f9fafb;
+  
+}
+
+/* Phone number input */
+.PhoneInputInput {
+  border: none !important;
+  outline: none !important;
+  background-color: #020202;
+  color: #f9fafb;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  
+}

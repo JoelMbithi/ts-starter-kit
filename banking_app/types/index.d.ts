@@ -49,7 +49,7 @@ declare type NewUserParams = {
   password: string;
 };
 
-declare type Account = {
+declare type BankAccount = {
   id: string;
   availableBalance: number;
   currentBalance: number;
@@ -59,7 +59,7 @@ declare type Account = {
   name: string;
   type: string;
   subtype: string;
-  appwriteItemId: string;
+  transactions: string;
   shareableId: string;
 };
 
@@ -218,8 +218,8 @@ declare interface FooterProps {
 
 declare interface RightSidebarProps {
   user: User;
-  transactions: Transaction[];
-  banks: Bank[] & Account[];
+   transactions: Transaction[];
+  banks: BankAccount[];
 }
 
 declare interface SiderbarProps {
