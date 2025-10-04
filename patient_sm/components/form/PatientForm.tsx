@@ -48,7 +48,7 @@ const PatientForm = () => {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
-      console.log("🚀 Creating user:", data);
+      console.log("Creating user:", data);
       
       const response = await fetch("/api/users", {
         method: "POST",
@@ -61,19 +61,19 @@ const PatientForm = () => {
       if (!response.ok) {
         // If user already exists (409), use the returned user data
         if (response.status === 409 && result.user) {
-          console.log("✅ User exists, redirecting with ID:", result.user.id);
+          console.log(" User exists, redirecting with ID:", result.user.id);
           router.push(`/patients/${result.user.id}/register`);
           return;
         }
-        console.error("❌ API Error:", result.error);
+        console.error(" API Error:", result.error);
         return;
       }
 
       // New user created - redirect with new user ID
-      console.log("✅ New user created, redirecting with ID:", result.user.id);
+      console.log(" New user created, redirecting with ID:", result.user.id);
       router.push(`/patients/${result.user.id}/register`);
     } catch (error) {
-      console.error("🔥 Error submitting form:", error);
+      console.error(" Error submitting form:", error);
     } finally {
       setIsLoading(false);
     }

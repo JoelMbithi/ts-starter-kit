@@ -25,33 +25,33 @@ export default function RegisterPage() {
       // Get userId from params
       const userId = params.userId as string;
       
-      console.log("🔄 Page: Fetching user with userId:", userId);
+      console.log(" Page: Fetching user with userId:", userId);
       
       // Validate userId
       if (!userId || userId === "undefined" || isNaN(Number(userId))) {
-        console.error("❌ Page: Invalid userId:", userId);
+        console.error(" Page: Invalid userId:", userId);
         setError(`Invalid user ID. Please start over from the registration form.`);
         setLoading(false);
         return;
       }
 
       try {
-        console.log("✅ Valid userId, fetching user data for ID:", userId);
+        console.log(" Valid userId, fetching user data for ID:", userId);
         const res = await fetch(`/api/users?id=${userId}`);
         
         if (!res.ok) {
           const errorData = await res.json();
-          console.error("❌ Page: Failed to fetch user:", errorData.error);
+          console.error(" Page: Failed to fetch user:", errorData.error);
           setError(errorData.error || "Failed to fetch user data");
           setLoading(false);
           return;
         }
 
         const userData = await res.json();
-        console.log("✅ Page: User data fetched successfully:", userData);
+        console.log(" Page: User data fetched successfully:", userData);
         setUser(userData);
       } catch (error) {
-        console.error("🔥 Page: Error fetching user:", error);
+        console.error(" Page: Error fetching user:", error);
         setError("Error fetching user data");
       } finally {
         setLoading(false);

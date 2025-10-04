@@ -116,7 +116,7 @@ const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
       formData.append("identificationDocument", values.identificationDocument[0]);
     }
 
-    console.log("🚀 Submitting patient form for user:", user.id);
+    console.log(" Submitting patient form for user:", user.id);
     
     // FIX: Use the correct API endpoint with capital P
     const response = await fetch("/api/Patient", { // Capital P to match folder name
@@ -126,12 +126,12 @@ const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("❌ Error creating patient:", errorText);
+      console.error(" Error creating patient:", errorText);
       throw new Error(`Failed to create patient: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log("✅ Patient created successfully:", result);
+    console.log(" Patient created successfully:", result);
 
     // Redirect to appointment page with patient ID
     if (result.patient?.id) {
@@ -140,7 +140,7 @@ const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
       router.push(`/patient/${result.id}/new-appointment`);
     }
   } catch (error) {
-    console.error("🔥 Error submitting patient form:", error);
+    console.error(" Error submitting patient form:", error);
   } finally {
     setIsLoading(false);
   }
