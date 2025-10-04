@@ -3,28 +3,35 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"  // or sqlite/mysql if you prefer
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
-  name      String?
+  name      String
   phone     String
   password  String
   createdAt DateTime  @default(now())
-  patients  Patient[] // one user can have many patients
+  patients  Patient[] 
 }
 
 model Patient {
-  id                        Int      @id @default(autoincrement())
-  email                     String   @unique
-  name                      String?
+  id                        Int                 @id @default(autoincrement())
+  email                     String              @unique
+  name                      String
   phone                     String
-  privacyConcent            Boolean
+
+  // Consent fields (all from your form)
+  treatmentConsent          Boolean
+  disclosureConsent         Boolean
+  privacyConsent            Boolean
+
+  // Personal info
   gender                    String?
-  birthDate                 String
+  birthDate                 DateTime?
+
   address                   String
   occupation                String
   emergencyContactName      String
@@ -34,15 +41,33 @@ model Patient {
   allergies                 String
   currentMedication         String
   familyMedicalHistory      String
-  pastmedicalHistory        String
-  identificationType        String
-  identificationNumber      Int
-  identificationId          Int
-  identificationDocumentUrl String
-  primaryPhysicion          String
+  pastmedicalHistory       String
+  
+
+  // Identification
+  identificationTypeId      Int
+  identificationType        IdentificationType  @relation(fields: [identificationTypeId], references: [id])
+  identificationNumber      String   
+  identificationDocumentUrl String?
+
+  // Primary Physician
+  primaryPhysician          String
+
   createdAt                 DateTime @default(now())
 
   // relation to User
   userId Int
   user   User @relation(fields: [userId], references: [id])
+}
+
+model Doctors {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  image String
+}
+
+model IdentificationType {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  patients Patient[] 
 }
