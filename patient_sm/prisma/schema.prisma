@@ -23,7 +23,7 @@ model Patient {
   name                      String
   phone                     String
 
-  // Consent fields (all from your form)
+  // Consent fields
   treatmentConsent          Boolean
   disclosureConsent         Boolean
   privacyConsent            Boolean
@@ -41,9 +41,8 @@ model Patient {
   allergies                 String
   currentMedication         String
   familyMedicalHistory      String
-  pastmedicalHistory       String
+  pastMedicalHistory        String  // Fixed spelling
   
-
   // Identification
   identificationTypeId      Int
   identificationType        IdentificationType  @relation(fields: [identificationTypeId], references: [id])
@@ -55,19 +54,48 @@ model Patient {
 
   createdAt                 DateTime @default(now())
 
-  // relation to User
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  // Relations
+  userId    Int
+  user      User            @relation(fields: [userId], references: [id])
+  appointments Appointment[] // Add this relation
+
+  @@map("patients")
 }
 
 model Doctors {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  image String
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  image        String
+  appointments Appointment[] // Add this relation
+
+  @@map("doctors")
 }
 
 model IdentificationType {
   id       Int       @id @default(autoincrement())
   name     String    @unique
   patients Patient[] 
+
+  @@map("identification_types")
+}
+
+model Appointment {
+  id          Int       @id @default(autoincrement())
+  date        DateTime
+  time        String
+  reason      String
+  status      String    @default("scheduled") // scheduled, completed, cancelled, rescheduled
+  notes       String?
+  
+  // Relations
+  patientId   Int
+  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  doctorId    Int
+  doctor      Doctors   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("appointments")
 }

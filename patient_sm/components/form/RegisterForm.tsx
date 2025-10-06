@@ -134,11 +134,13 @@ const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     console.log(" Patient created successfully:", result);
 
     // Redirect to appointment page with patient ID
-    if (result.patient?.id) {
-      router.push(`/patient/${result.patient.id}/new-appointment`);
-    } else if (result.id) {
-      router.push(`/patient/${result.id}/new-appointment`);
-    }
+ 
+if (result.patient?.id) {
+  router.push(`/patients/${result.patient.id}/new-appointment`);
+} else if (result.id) {
+  router.push(`/patients/${result.id}/new-appointment`);
+}
+
   } catch (error) {
     console.error(" Error submitting patient form:", error);
   } finally {

@@ -15,14 +15,14 @@ export async function POST(req: Request) {
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
-      include: { patients: true }, // Include patients in the response
+      include: { patients: true },
     });
 
     if (existingUser) {
       return NextResponse.json(
         { 
           error: "User Already Exists",
-          user: existingUser // Return the existing user with patients
+          user: existingUser 
         },
         { status: 409 }
       );
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     // Create new user
     const user = await prisma.user.create({
       data: { email, name, password, phone },
-      include: { patients: true }, // Include patients in the response
+      include: { patients: true },
     });
 
     return NextResponse.json(

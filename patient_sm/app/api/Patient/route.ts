@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         allergies: allergies || "",
         currentMedication: currentMedication || "",
         familyMedicalHistory: familyMedicalHistory || "",
-        pastmedicalHistory: pastmedicalHistory || "",
+         pastMedicalHistory: pastmedicalHistory || "",
         identificationTypeId: parseInt(identificationTypeId),
         identificationNumber,
         gender: gender || null,
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const patientId = searchParams.get("id");
+    const patientId = searchParams.get("patientId");
 
     if (!patientId || isNaN(Number(patientId))) {
       return NextResponse.json(
