@@ -34,6 +34,7 @@ const AppointmentForm = ({ patientId, patient, type }: AppointmentFormProps) => 
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
 
+
   let buttonLabel;
   switch (type) {
     case 'cancel':
@@ -85,7 +86,8 @@ const AppointmentForm = ({ patientId, patient, type }: AppointmentFormProps) => 
       console.log(" Appointment created:", result);
       
       // Redirect to success page or appointments list
-      router.push(`/patient/${patientId}/appointments/success`);
+      router.push(`/patients/${patientId}/appointments/success?appointmentId=${result.appointment.id}`);
+
       
     } catch (error) {
       console.error(" Error submitting form:", error);
@@ -108,6 +110,8 @@ const AppointmentForm = ({ patientId, patient, type }: AppointmentFormProps) => 
     }
   };
 
+ 
+
   // Generate available times
   const generateTimeSlots = () => {
     const times = [];
@@ -123,6 +127,7 @@ const AppointmentForm = ({ patientId, patient, type }: AppointmentFormProps) => 
   useEffect(() => {
     fetchDoctors();
     generateTimeSlots();
+   
   }, []);
 
   return (

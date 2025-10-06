@@ -7,8 +7,11 @@ interface CreateUserParams {
 
 interface SearchParamsProps {
       params: {
-    userId: string
+    userId: string,
+    
   }
+  searchParams: string
+  appointmentId: string
 }
 
 interface RegistionProps {
@@ -34,4 +37,8 @@ interface  IdentificationType{
   id: string
   name: string
   value: string
+}
+
+interface Appointment {
+
 }

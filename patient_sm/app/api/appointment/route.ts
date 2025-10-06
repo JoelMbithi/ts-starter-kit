@@ -50,3 +50,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+
+/* export async function GET() {
+  try {
+    const response = await prisma.appointment.findMany()
+    return NextResponse.json(response)
+  } catch (error) {
+   console.log(error);
+    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
+  }
+} */
+
+  export async function GET(req: Request, { params }: { params: { id: string } }) {
+  try {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: parseInt(params.id) },
+      include: { doctor: true, patient: true }
+    });
+    return NextResponse.json(appointment);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to fetch appointment' }, { status: 500 });
+  }
+}
