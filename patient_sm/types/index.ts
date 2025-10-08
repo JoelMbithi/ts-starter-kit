@@ -5,14 +5,23 @@ interface CreateUserParams {
 }
 
 
-interface SearchParamsProps {
+/* interface SearchParamsProps {
       params: {
     userId: string,
     
   }
   searchParams: string
   appointmentId: string
+  admin?: string
+} */
+interface SearchParamsProps {
+  searchParams: {
+    admin?: string
+    appointmentId?: string
+    [key: string]: string | undefined  
+  }
 }
+
 
 interface RegistionProps {
   params: {

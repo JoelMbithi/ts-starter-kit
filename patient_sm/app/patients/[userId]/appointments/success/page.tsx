@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -32,6 +33,7 @@ interface Appointment {
 const Success = () => {
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get("appointmentId");
+  const patientId = searchParams.get("patientId"); // Get userId from search params if available
 
   const [appointment, setAppointment] = useState<Appointment | null>(null);
 
@@ -93,7 +95,7 @@ const Success = () => {
           <h1>We will be in touch shortly to confirm.</h1>
         </section>
 
-        <section className="flex w-full flex-col items-center gap-8 border-y-2 border-dark-400 py-8 md:w-fit md:flex-row">
+        <section className="flex w-full flex-col items-center gap-8 border-y-1 border-dark-400 py-8 md:w-fit md:flex-row">
           <p>Requested appointment details:</p>
           {appointment && (
             <div className="flex items-center gap-3">
@@ -117,7 +119,15 @@ const Success = () => {
             
           )}
          
-        </section>
+         </section>
+        <Button className="bg-green-500 hover:bg-green-600 text-white" variant="outline" asChild>
+             <Link href={ `/patients/${patientId}/new-appointment` }>
+            
+             New Appointment</Link>
+       
+        </Button>
+
+        <p className='text-xl '>&copy; 2025 CarePulse</p>
       </div>
     </div>
   );

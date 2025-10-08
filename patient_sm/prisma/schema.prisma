@@ -79,6 +79,7 @@ model IdentificationType {
   @@map("identification_types")
 }
 
+
 model Appointment {
   id          Int       @id @default(autoincrement())
   date        DateTime
@@ -98,4 +99,11 @@ model Appointment {
   updatedAt   DateTime  @updatedAt
 
   @@map("appointments")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  passKey   String   // Hashed passkey
+  createdAt DateTime @default(now())
 }

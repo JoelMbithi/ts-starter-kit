@@ -1,12 +1,17 @@
+import PasskeyModel from "@/components/admin/PasskeyModel";
 import PatientForm from "@/components/form/PatientForm";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
+  const params = await searchParams;
+  const isAdmin = params.admin === 'true';
+
   
   return (
    <div className="flex h-screen w-full max-h-screen">
+    { isAdmin && <PasskeyModel />}
      <section className="remove-scrollbar flex items-center w-full  justify-center my-auto ">
       <div className="flex w-120 flex-col px-10 "> 
         <Image src="/assets/icons/logo-full.svg" alt="logo"

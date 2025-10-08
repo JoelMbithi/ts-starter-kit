@@ -86,7 +86,8 @@ const AppointmentForm = ({ patientId, patient, type }: AppointmentFormProps) => 
       console.log(" Appointment created:", result);
       
       // Redirect to success page or appointments list
-      router.push(`/patients/${patientId}/appointments/success?appointmentId=${result.appointment.id}`);
+     router.push(`/patients/${patientId}/appointments/success?appointmentId=${result.appointment.id}&patientId=${patientId}`);
+
 
       
     } catch (error) {
