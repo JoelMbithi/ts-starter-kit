@@ -1,7 +1,7 @@
   "use client"
 
   import StatCard from '@/components/admin/StatCard'
-import { columns, Payment } from '@/components/admin/table/columns'
+import { columns } from '@/components/admin/table/columns'
 import { DataTable } from '@/components/admin/table/DataTable'
   import Image from 'next/image'
   import Link from 'next/link'

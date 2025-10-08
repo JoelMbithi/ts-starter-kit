@@ -49,5 +49,16 @@ interface  IdentificationType{
 }
 
 interface Appointment {
-
+  id: string
+  date: string          // ISO string date
+  time: string          // e.g., "12:30"
+  reason: string
+  status: "scheduled" | "pending" | "cancelled"
+  notes?: string
+  patientId: string
+  doctorId: string
+      // relation to patient
+  doctor: Doctor        // relation to doctor
+  createdAt: string
+  updatedAt: string
 }

@@ -18,7 +18,7 @@ const StatusBadge = ({status}: StatusProps) => {
     <div className={clsx('flex w-fit items-center gap-2 rounded-full px-4 py-2',{
         'bg-green-500': status === 'scheduled',
         'bg-blue-500': status === 'pending',
-        'bg-red-500': status === 'cancelled'
+        'bg-red-500/60': status === 'cancelled'
     })}>
 
         <Image
@@ -31,7 +31,7 @@ const StatusBadge = ({status}: StatusProps) => {
       <p className={clsx('text-sm font-semibold capitalize',{
         'text-green-200': status === 'scheduled',
         'text-blue-200': status === 'pending',
-        'text-red-500': status === 'cancelled'
+        'text-red-200': status === 'cancelled'
       })}>{status}</p>
     </div>
   )

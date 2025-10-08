@@ -1,77 +1,78 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+// Tailwind merge utility
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Deep clone helper
 export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
 
+// Convert file to object URL
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
 
-// FORMAT DATE TIME
-export const formatDateTime = (dateString: Date | string) => {
-  const dateTimeOptions: Intl.DateTimeFormatOptions = {
-    // weekday: "short", // abbreviated weekday name (e.g., 'Mon')
-    month: "short", // abbreviated month name (e.g., 'Oct')
-    day: "numeric", // numeric day of the month (e.g., '25')
-    year: "numeric", // numeric year (e.g., '2023')
-    hour: "numeric", // numeric hour (e.g., '8')
-    minute: "numeric", // numeric minute (e.g., '30')
-    hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
+/**
+ * ✅ FORMAT DATE TIME
+ * Correctly formats DB date + time without UTC shift.
+ * Supports "10:00 AM" or "14:30" time formats.
+ */
+export const formatDateTime = (dateString: string, timeString?: string) => {
+  if (!dateString) return { dateTime: "", dateOnly: "", timeOnly: "" };
+
+  // Extract date components
+  const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
+
+  let hours = 0;
+  let minutes = 0;
+
+  // Parse time string
+  if (timeString) {
+    const match = timeString.match(/(\d+):(\d+)\s*(AM|PM)?/i);
+    if (match) {
+      hours = parseInt(match[1], 10);
+      minutes = parseInt(match[2], 10);
+
+      const period = match[3]?.toUpperCase();
+      if (period === "PM" && hours < 12) hours += 12;
+      if (period === "AM" && hours === 12) hours = 0;
+    }
+  }
+
+  // ✅ Construct date/time in LOCAL TIME (no UTC)
+  const exactDateTime = new Date(year, month - 1, day, hours, minutes);
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
   };
-
-  const dateDayOptions: Intl.DateTimeFormatOptions = {
-    weekday: "short", // abbreviated weekday name (e.g., 'Mon')
-    year: "numeric", // numeric year (e.g., '2023')
-    month: "2-digit", // abbreviated month name (e.g., 'Oct')
-    day: "2-digit", // numeric day of the month (e.g., '25')
-  };
-
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    month: "short", // abbreviated month name (e.g., 'Oct')
-    year: "numeric", // numeric year (e.g., '2023')
-    day: "numeric", // numeric day of the month (e.g., '25')
-  };
-
-  const timeOptions: Intl.DateTimeFormatOptions = {
-    hour: "numeric", // numeric hour (e.g., '8')
-    minute: "numeric", // numeric minute (e.g., '30')
-    hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
-  };
-
-  const formattedDateTime: string = new Date(dateString).toLocaleString(
-    "en-US",
-    dateTimeOptions
-  );
-
-  const formattedDateDay: string = new Date(dateString).toLocaleString(
-    "en-US",
-    dateDayOptions
-  );
-
-  const formattedDate: string = new Date(dateString).toLocaleString(
-    "en-US",
-    dateOptions
-  );
-
-  const formattedTime: string = new Date(dateString).toLocaleString(
-    "en-US",
-    timeOptions
-  );
 
   return {
-    dateTime: formattedDateTime,
-    dateDay: formattedDateDay,
-    dateOnly: formattedDate,
-    timeOnly: formattedTime,
+    dateTime: exactDateTime.toLocaleString("en-US", options),
+    dateOnly: exactDateTime.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+    timeOnly: exactDateTime.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    }),
   };
 };
 
+/**
+ * Simple Base64 encryption/decryption
+ */
 export function encryptKey(passkey: string) {
   return btoa(passkey);
 }
 
 export function decryptKey(passkey: string) {
   return atob(passkey);
-}  
+}

@@ -60,7 +60,19 @@ export async function GET() {
       select: {
         name: true
       }
-    }
+    },
+    doctor: {
+      select: {
+        name:true,
+        image:true
+      }
+    },
+     /*  User: {
+      select: {
+        name:true,
+        image:true
+      }
+    } */
   }
     })
     return NextResponse.json(response)
@@ -81,3 +93,6 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch appointment' }, { status: 500 });
   }
 } */
+
+
+ 
