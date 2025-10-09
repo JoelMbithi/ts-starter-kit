@@ -1,25 +1,14 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  - You are about to drop the `Doctors` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `IdentificationType` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Patient` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "public"."Patient" DROP CONSTRAINT "Patient_identificationTypeId_fkey";
-
--- DropForeignKey
-ALTER TABLE "public"."Patient" DROP CONSTRAINT "Patient_userId_fkey";
-
--- DropTable
-DROP TABLE "public"."Doctors";
-
--- DropTable
-DROP TABLE "public"."IdentificationType";
-
--- DropTable
-DROP TABLE "public"."Patient";
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "patients" (
@@ -75,7 +64,7 @@ CREATE TABLE "appointments" (
     "date" TIMESTAMP(3) NOT NULL,
     "time" TEXT NOT NULL,
     "reason" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'scheduled',
+    "status" TEXT NOT NULL DEFAULT 'pending',
     "notes" TEXT,
     "patientId" INTEGER NOT NULL,
     "doctorId" INTEGER NOT NULL,
@@ -85,6 +74,19 @@ CREATE TABLE "appointments" (
     CONSTRAINT "appointments_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Admin" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "passKey" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
 -- CreateIndex
 CREATE UNIQUE INDEX "patients_email_key" ON "patients"("email");
 
@@ -93,6 +95,9 @@ CREATE UNIQUE INDEX "doctors_name_key" ON "doctors"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "identification_types_name_key" ON "identification_types"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Admin_email_key" ON "Admin"("email");
 
 -- AddForeignKey
 ALTER TABLE "patients" ADD CONSTRAINT "patients_identificationTypeId_fkey" FOREIGN KEY ("identificationTypeId") REFERENCES "identification_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

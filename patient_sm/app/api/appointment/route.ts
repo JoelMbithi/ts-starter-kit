@@ -33,7 +33,7 @@ export async function POST(req: Request) {
         time,
         reason,
         notes: notes || "",
-        status: "scheduled",
+        status: "pending",
       },
       include: {
         doctor: true,

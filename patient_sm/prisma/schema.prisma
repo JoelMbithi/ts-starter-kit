@@ -85,7 +85,7 @@ model Appointment {
   date        DateTime
   time        String
   reason      String
-  status      String    @default("scheduled") // scheduled, completed, cancelled, rescheduled
+  status      String    @default("pending")
   notes       String?
   
   // Relations
@@ -106,4 +106,13 @@ model Admin {
   email     String   @unique
   passKey   String   // Hashed passkey
   createdAt DateTime @default(now())
+}
+
+
+model VerificationCode {
+  id        Int      @id @default(autoincrement())
+  phone     String
+  code      String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }

@@ -206,7 +206,7 @@ const fetchSingleAppointment = async (id: string) => {
       console.log("Fetched appointment:", data);
       setCurrentAppointment(data);
 
-      // 🧠 Prefill form with existing appointment details
+      //  Prefill form with existing appointment details
       form.reset({
        doctorId: data.doctor?.name || "",
       
