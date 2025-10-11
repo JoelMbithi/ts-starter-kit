@@ -2,6 +2,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import NavbarItems from './NavbarItems'
+import {
+
+  SignInButton,
+
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
+
 
 const navbar = () => {
   return (
@@ -19,7 +28,16 @@ const navbar = () => {
 
       <div className='flex items-center gap-8'>
         <NavbarItems/>
-        <p>Sign In</p>
+       <SignedOut>
+              <SignInButton >
+                <div className='btn-signin'>Sign In</div>
+              </SignInButton>
+             
+               
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl='/' />
+            </SignedIn>
       </div>
     </div>
   )

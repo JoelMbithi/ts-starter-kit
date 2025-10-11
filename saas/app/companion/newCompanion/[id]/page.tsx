@@ -1,11 +1,11 @@
 import React from 'react'
 
-const page = () => {
+const newcompanion = () => {
   return (
     <div>
-      dynamic
+      new companion
     </div>
   )
 }
 
-export default page
+export default newcompanion

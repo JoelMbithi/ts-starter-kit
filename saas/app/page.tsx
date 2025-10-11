@@ -48,6 +48,7 @@ const page = () => {
         title="Recent completed sessions"
         companions={recentSessions}
         classNames="w-2/3 max-lg:w-full"
+        name={recentSessions}
         />
         <Cta />
       </section>

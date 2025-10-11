@@ -1,9 +1,10 @@
+import { PricingTable } from '@clerk/nextjs'
 import React from 'react'
 
 const subscription = () => {
   return (
     <div>
-      subscription
+    <PricingTable/>
     </div>
   )
 }
