@@ -2,7 +2,7 @@ import CompanionCard from "@/components/Companion/CompanionCard";
 import CompanionList from "@/components/Companion/CompanionList";
 import Cta from "@/components/Companion/Cta";
 import { Button } from "@/components/ui/button";
-import { recentSessions } from "@/constants";
+import { recentSessions, subjectsColors } from "@/constants";
 import React from "react";
 
 const page = () => {
@@ -49,6 +49,7 @@ const page = () => {
         companions={recentSessions}
         classNames="w-2/3 max-lg:w-full"
         name={recentSessions}
+       
         />
         <Cta />
       </section>

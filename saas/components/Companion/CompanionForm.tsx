@@ -63,11 +63,11 @@ const CompanionForm = () => {
  
   // 2. Define a submit handler.
    const  onSubmit= async (values: z.infer<typeof formSchema>) => {
-   
+     setLoading(true)
   try {
     const companion = await createCompanion(values)
   
-console.log(companion);
+/* console.log(companion); */
 
     if(companion){
              router.push(`/companion/newCompanion/${companion.id}`)
@@ -76,7 +76,9 @@ console.log(companion);
      router.push('/')
     }
   } catch (error) {
-    
+    console.log(error)
+  }finally{
+    setLoading((false))
   }
   }
   return (
@@ -197,16 +199,21 @@ console.log(companion);
             
           )}
         />
-     {loading ? (
-  <div className="flex items-center justify-center gap-2">
-    <Loader2 className="animate-spin" />
-    <span>Loading...</span>
-  </div>
-) : (
-  <Button type="submit" className="w-full cursor-pointer">
-    Build Your Companion
-  </Button>
-)}
+   <Button 
+  type="submit" 
+  className="w-full flex items-center justify-center gap-2 cursor-pointer"
+  disabled={loading} 
+>
+  {loading ? (
+    <>
+      <Loader2 className="animate-spin" />
+      <span>Loading...</span>
+    </>
+  ) : (
+    <>Build Your Companion</>
+  )}
+</Button>
+
 
       </form>
     </Form>

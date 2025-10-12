@@ -14,7 +14,7 @@ interface CompanionCardProps{
 
 const CompanionCard = ({id,name,topic,subject,duration,color,test}: CompanionCardProps) => {
   return (
-    <article className={`companion-card ${color}`} >
+    <article className={`companion-card ${color}`}  style={{ backgroundColor: color }} >
       <div className="flex justify-between items-center">
         <div className="subject-badge">
             {subject}
