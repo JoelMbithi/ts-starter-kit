@@ -39,3 +39,5 @@ interface CompanionAIProps {
     style:string
     voice:string
 }
+
+
