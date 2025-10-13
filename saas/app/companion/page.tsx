@@ -1,4 +1,6 @@
 import CompanionCard from "@/components/Companion/CompanionCard";
+import SearchInput from "@/components/Filter/SearchInput";
+import SubjectFilter from "@/components/Filter/SubjectFilter";
 import { subjectsColors } from "@/constants";
 import { GetAllCompanions } from "@/lib/actions/companion.action";
 import React from "react";
@@ -26,7 +28,10 @@ const Companion = async ({ searchParams }: SearchParamsProps) => {
     <main>
       <section className="flex justify-between gap-4 max-sm:flex-col">
         <h1 className="text-2xl font-bold">Companion Library</h1>
-        <div className="flex gap-4 text-gray-500">Filters</div>
+        <div className="flex gap-4 text-gray-500">
+          <SearchInput/>
+          <SubjectFilter/>
+        </div>
       </section>
 
       <section className="companions-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

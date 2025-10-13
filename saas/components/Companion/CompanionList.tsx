@@ -41,7 +41,7 @@ const CompanionList = ({ title, companions, classNames }: CompanionListProps) =>
         </TableHeader>
         <TableBody>
           {companions?.map((companion, index) => {
-            // ✅ Automatically pick a color based on subject or fallback
+            //  Automatically pick a color based on subject or fallback
             const backgroundColor =
               subjectsColors[companion.subject.toLowerCase() as keyof typeof subjectsColors] ||
               companion.color ||

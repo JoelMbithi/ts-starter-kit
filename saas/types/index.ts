@@ -28,3 +28,14 @@ interface SearchParams {
   subject?: string | string[];
   topic?: string | string[];
 }
+
+interface CompanionAIProps {
+    companionId: string
+    subject: string
+    topic: string
+    name:string
+    userName:string
+    userImage:string
+    style:string
+    voice:string
+}
