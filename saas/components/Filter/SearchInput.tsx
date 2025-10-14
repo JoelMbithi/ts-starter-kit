@@ -42,7 +42,7 @@ const SearchInput = () => {
         width={15}
 
       />
-      <input type="text" placeholder='Search companions'
+      <input type="text" placeholder='Search Topic'
        className='outline-none text-black'
        value={searchQuery}
        onChange={(e) => setSearchQuery(e.target.value)}

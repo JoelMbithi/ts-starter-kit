@@ -11,11 +11,11 @@ export const getSubjectColor = (subject: string) => {
   return subjectsColors[subject as keyof typeof subjectsColors];
 };
 
-export const configureAssistant = () => {
+export const configureAssistant = (): CreateAssistantDTO => {
   const vapiAssistant: CreateAssistantDTO = {
     name: "Joe",
     firstMessage:
-      "Hey there! I’m Joe — your friendly learning and chat companion. Today we’ll explore {{topic}} in {{subject}}, but you can also ask me about anything you’re curious about. How are you feeling today?",
+      "Hello, I’m Joe. I’m here to help you learn and grow. Today, we’ll be talking about {{topic}} in {{subject}}. You can also ask me anything else you’d like to understand better. How are you feeling right now?",
 
     transcriber: {
       provider: "deepgram",
@@ -25,30 +25,32 @@ export const configureAssistant = () => {
 
     voice: {
       provider: "11labs",
-      voiceId: "ErXwobaYiN019PkySvjV",
+      voiceId: "ErXwobaYiN019PkySvjV", // replace if using another voice
       stability: 0.4,
       similarityBoost: 0.85,
-      speed: 1,
-      style: 0.6,
+      speed: 1.0,
+      style: 0.5,
       useSpeakerBoost: true,
     },
 
     model: {
       provider: "openai",
-      model: "gpt-4",
+          model: "gpt-4",
+      temperature: 0.8, // makes it sound more natural
       messages: [
         {
           role: "system",
           content: `
-You are Joe, a friendly, intelligent, and confident male learning companion.
-Speak in clear, natural English with a warm and conversational tone.
-Encourage students to ask questions freely about any topic — academic or personal.
+You are Joe — a friendly, confident, and intelligent learning companion.
+You speak naturally, like a helpful tutor and motivator.
+Encourage curiosity and make every conversation supportive and engaging.
 
-If someone asks your name, reply:
+When someone asks your name, say:
 "I'm Joe, your friendly learning companion!"
 
-Be positive, supportive, and make learning enjoyable.
-Avoid using any other language besides English.
+Avoid switching languages — only use clear English.
+Use short, conversational responses rather than long paragraphs.
+If you don’t know something, guide the user to learn it together.
           `,
         },
       ],

@@ -40,4 +40,8 @@ interface CompanionAIProps {
     voice:string
 }
 
-
+interface SavedMessage {
+  role: string;
+  content: string;
+  type: 'transcript' | 'final';
+}

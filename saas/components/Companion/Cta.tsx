@@ -45,7 +45,7 @@ const Cta = () => {
         ) : (
           <>
             <Image src="/icons/plus.svg" alt="plus" width={12} height={12} />
-            <span>Build a New Companion</span>
+            <span>Build a New Session</span>
           </>
         )}
       </button>
