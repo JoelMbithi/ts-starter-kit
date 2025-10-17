@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\support\Facades\Auth;
-use App\Model\Teacher;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\Teacher;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TeacherController extends Controller
 {
@@ -15,16 +17,18 @@ class TeacherController extends Controller
 {
     $tenantId = Auth::user()->tenant_id;
     $teachers = Teacher::where('tenant_id', $tenantId)->get();
+      $totalTeachers = $teachers->count();
 
-    return Inertia::render('teacher/index', [
+    return Inertia::render('Teachers/page', [
         'tenant_id' => $tenantId,
         'teachers' => $teachers,
+        'totalTeachers' => $totalTeachers,
     ]);
 }
 
 //create new Teacher
   public function create(){
-     return Inertia::render('teacher/Create');
+     return Inertia::render('Teachers/Create');
   }
 
   //Save a new teacher
@@ -44,7 +48,7 @@ class TeacherController extends Controller
 
   //edit teacher
   public function edit ()  {
-    return Inertia::render('teacher/Edit',[
+    return Inertia::render('Teacher/Edit',[
     'teacher' => $teacher,
     ]);
 }
@@ -58,7 +62,7 @@ public function update (Request $request, Teacher $teacher){
         'subject' => 'required|string|max:255',
 
     ]);
-    $teacher -> upadte($validated);
+    $teacher -> update($validated);
 
     return Redirect::route('teachers.index')-> with('success', 'Teacher updated successfully!');
 }
@@ -69,4 +73,23 @@ public function destroy(Teacher $teacher){
     return Redirect::route('teachers.index')->with("success", "Teacher successfully Deleted");
 }
 
+public function search(Request $request)
+{
+    $tenantId = Auth::user()->tenant_id;
+    $query = $request->input('query');
+
+    $teachers = Teacher::where('tenant_id', $tenantId)
+        ->where(function ($q) use ($query) {
+            $q->where('first_name', 'ILIKE', "%{$query}%")
+              ->orWhere('last_name', 'ILIKE', "%{$query}%")
+              ->orWhere('subject', 'ILIKE', "%{$query}%");
+        })
+        ->get();
+
+    return response()->json($teachers);
 }
+
+
+}
+
+
