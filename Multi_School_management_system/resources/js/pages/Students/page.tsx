@@ -28,6 +28,7 @@ export default function Students() {
   
   // Props from the server
   const { students = [], totalStudents = 0 } = usePage<PageProps>().props;
+   console.log('Dashboard props:', students);
 
   // Form state (for adding/editing if needed)
   const { data, setData, post, processing, errors, reset } = useForm({

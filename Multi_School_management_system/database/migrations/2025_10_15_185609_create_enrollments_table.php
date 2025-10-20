@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedInteger('tenant_id');
             $table->unsignedInteger('student_id');
             $table->unsignedInteger('course_id');
-            $table->unsignedInteger('teacher_id');
+            $table->unsignedInteger('teacher_id')->nullable();
+
 
             // Date field with PostgreSQL-compatible default
             $table->date('enroll_date')->default(DB::raw('CURRENT_DATE'));

@@ -4,33 +4,31 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
+use App\Models\Enrollment;
+use App\Models\Course;
+use App\Models\Teacher;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class StudentController extends Controller
 {
-    // Show all students
     public function index()
     {
         $tenantId = Auth::user()->tenant_id;
         $students = Student::where('tenant_id', $tenantId)->get();
-        $totalStudents = $students->count();
+        $teachers = Teacher::where('tenant_id', $tenantId)->get();
+        $courses = Course::where('tenant_id', $tenantId)->get();
 
         return Inertia::render('Students/page', [
-            'tenant_id' => $tenantId,
             'students' => $students,
-            'totalStudents' => $totalStudents,
+            'teachers' => $teachers,
+            'courses' => $courses,
+            'totalStudents' => $students->count(),
         ]);
     }
 
-    // Show create student form
-    public function create()
-    {
-        return Inertia::render('Students/Create');
-    }
-
-    // Store a new student
+    
     public function store(Request $request)
     {
         $tenantId = Auth::user()->tenant_id;
@@ -42,15 +40,36 @@ class StudentController extends Controller
             'class' => 'required|string|max:10',
             'age' => 'required|integer|min:3',
             'registration_number' => 'required|string|unique:students,registration_number',
+            'course_id' => 'required|exists:courses,course_id',
+            'teacher_id' => 'required|exists:teachers,teacher_id',
         ]);
 
-        $student = Student::create(array_merge($validated, [
+        //  Create student
+        $student = Student::create([
             'tenant_id' => $tenantId,
-        ]));
- return Redirect::route('students.index')->with('success', 'Student added successfully!');
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'grade' => $validated['grade'],
+            'class' => $validated['class'],
+            'age' => $validated['age'],
+            'registration_number' => $validated['registration_number'],
+        ]);
+
+        //  Auto-create enrollment (renamed 'class' → 'class_name')
+        Enrollment::create([
+            'tenant_id' => $tenantId,
+            'student_id' => $student->student_id,
+            'course_id' => $validated['course_id'],
+            'teacher_id' => $validated['teacher_id'],
+            'class_name' => $validated['class'], //  Fixed here
+            'enrollment_date' => now(),
+            'status' => 'Active',
+        ]);
+
+        return Redirect::route('students.index')
+            ->with('success', 'Student and enrollment added successfully!');
     }
 
-    // Show edit student form
     public function edit(Student $student)
     {
         return Inertia::render('Students/Edit', [
@@ -58,35 +77,32 @@ class StudentController extends Controller
         ]);
     }
 
-    // Update an existing student
-public function update(Request $request, Student $student)
-{
-    $validated = $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'grade' => 'required|string|max:10',
-        'class' => 'required|string|max:10',
-        'age' => 'required|integer|min:3',
-        'registration_number' => 'required|string|unique:students,registration_number,' . $student->id,
-    ]);
+    public function update(Request $request, Student $student)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'grade' => 'required|string|max:10',
+            'class' => 'required|string|max:10',
+            'age' => 'required|integer|min:3',
+            'registration_number' => 'required|string|unique:students,registration_number,' . $student->student_id . ',student_id',
+        ]);
 
-    $student->update($validated);
+        $student->update($validated);
 
-    // Return JSON for Inertia useForm
-    return response()->json([
-        'message' => 'Student updated successfully!',
-        'student' => $student,
-    ]);
-}
+        return response()->json([
+            'message' => 'Student updated successfully!',
+            'student' => $student,
+        ]);
+    }
 
-    // Delete a student
     public function destroy(Student $student)
     {
         $student->delete();
-        return Redirect::route('students.index')->with('success', 'Student successfully deleted');
+        return Redirect::route('students.index')
+            ->with('success', 'Student successfully deleted');
     }
 
-    // Search students
     public function search(Request $request)
     {
         $tenantId = Auth::user()->tenant_id;
