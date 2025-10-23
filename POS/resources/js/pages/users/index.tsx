@@ -245,7 +245,7 @@ export default function Dashboard() {
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead className="">Action</TableHead>
               </TableRow>
             </TableHeader>
 
