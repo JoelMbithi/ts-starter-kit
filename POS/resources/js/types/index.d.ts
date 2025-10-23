@@ -14,6 +14,9 @@ export interface NavGroup {
     title: string;
     items: NavItem[];
 }
+export interface data {
+    
+}
 
 export interface NavItem {
     title: string;
