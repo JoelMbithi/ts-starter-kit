@@ -6,7 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order_Details extends Model
 {
-        protected $table= 'order_details';
-    protected $fillable= ['order_id', 'product_id', 'quantity', 'unitprice', 'amount', 'discount'];
+    protected $table = 'order_details';
+    protected $fillable = [
+        'order_id',
+        'product_id',
+        'quantity',
+        'unitprice',
+        'amount',
+        'discount',
+    ];
+
+    // Relationships
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Products::class, 'product_id');
+    }
 }
-  

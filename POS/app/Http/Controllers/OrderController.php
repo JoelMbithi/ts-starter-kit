@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,7 +14,21 @@ class OrderController extends Controller
      */
     public function index()
     {
-         return Inertia::render('orders/index');
+        $products = Products::paginate();
+        $orders = Order::all()->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'name' => $order->name,
+                'address' => $order->address,
+                'created_at' => $order->created_at,
+                'total' => $order->total,
+            ];
+        });
+
+        return Inertia::render('orders/index', [
+            'products' => $products,
+            'orders' => $orders,
+        ]);
     }
 
     /**
@@ -21,7 +36,8 @@ class OrderController extends Controller
      */
     public function create()
     {
-        //
+        $products = Products::all();
+        return Inertia::render('orders/create', ['products' => $products]);
     }
 
     /**
@@ -29,7 +45,29 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the request
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'cart' => 'required|array',
+            'cart.*.product.id' => 'required|exists:products,id',
+            'cart.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        // Calculate total from cart
+        $total = collect($validated['cart'])->sum(function ($item) {
+            $product = Products::find($item['product']['id']);
+            return $product->price * $item['quantity'];
+        });
+
+        // Create the Order
+        $order = Order::create([
+            'name' => $validated['name'],
+            'address' => $validated['address'],
+            'total' => $total,
+        ]);
+
+       return back()->with("success", "Order created successfully!");
     }
 
     /**

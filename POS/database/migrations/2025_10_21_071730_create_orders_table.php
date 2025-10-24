@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->nullable();
-            $table->text('address')->nullable();
-            $table->timestamps();
-        });
+       Schema::create('orders', function (Blueprint $table) {
+    $table->id();
+    $table->string('name')->nullable();
+    $table->text('address')->nullable();
+    $table->decimal('total', 8, 2)->default(0);
+    $table->timestamps();
+});
+
     }
 
     /**
