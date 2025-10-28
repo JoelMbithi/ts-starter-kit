@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Transactions;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TransactionsController extends Controller
 {
@@ -12,7 +14,22 @@ class TransactionsController extends Controller
      */
     public function index()
     {
-        //
+        $orders = Order::select('id', 'name', 'address', 'created_at', 'total', 'payment_method')
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'name' => $order->name,
+                    'address' => $order->address,
+                    'created_at' => $order->created_at->toISOString(),
+                    'total' => $order->total,
+                    'payment_method' => $order->payment_method,
+                ];
+            });
+
+        return Inertia::render('transactions/index', [
+            'orders' => $orders,
+        ]);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Order_Details;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,6 +21,8 @@ class OrderController extends Controller
                 'id' => $order->id,
                 'name' => $order->name,
                 'address' => $order->address,
+                'product_name' => $order->orderDetails->first()->product_name ?? 'N/A',
+                 'payment_method' => $order->payment_method,
                 'created_at' => $order->created_at,
                 'total' => $order->total,
             ];
@@ -42,15 +45,62 @@ class OrderController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 
+     * 
      */
-    public function store(Request $request)
+      public function store(Request $request)
+    {
+        //  Validate
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'cart' => 'required|array',
+            'payment_method' => 'required|in:cash,bank,card',
+            'cart.*.product.id' => 'required|exists:products,id',
+            'cart.*.product_name' => 'required|string',
+            'cart.*.price' => 'required|numeric',
+            'cart.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        //  Calculate total
+        $total = collect($validated['cart'])->sum(function ($item) {
+            return $item['price'] * $item['quantity'];
+        });
+
+        // Create the main order
+        $order = Order::create([
+            'name' => $validated['name'],
+            'address' => $validated['address'],
+            'payment_method' => $validated['payment_method'],
+            'total' => $total,
+        ]);
+
+        //  Save order details (with product name)
+        foreach ($validated['cart'] as $item) {
+            Order_Details::create([
+                'order_id' => $order->id,
+                'product_id' => $item['product']['id'], 
+                'product_name' => $item['product_name'],
+                'quantity' => $item['quantity'],
+                'unitprice' => $item['price'],
+                'amount' => $item['price'] * $item['quantity'],
+                'discount' => 0,
+            ]);
+        }
+
+        return back()->with("success", "Order created successfully!");
+    }
+    /* public function store(Request $request)
     {
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'cart' => 'required|array',
+            'payment_method' => 'required|in:cash,bank,card', 
             'cart.*.product.id' => 'required|exists:products,id',
+             'cart.*.product_name' => 'required|string',
+             'cart.*.price' => 'required|numeric',
             'cart.*.quantity' => 'required|integer|min:1',
         ]);
 
@@ -64,11 +114,12 @@ class OrderController extends Controller
         $order = Order::create([
             'name' => $validated['name'],
             'address' => $validated['address'],
+             'payment_method' => $validated['payment_method'],
             'total' => $total,
         ]);
 
        return back()->with("success", "Order created successfully!");
-    }
+    } */
 
     /**
      * Display the specified resource.
